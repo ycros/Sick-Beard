@@ -22,6 +22,7 @@ from aniDBlink import AniDBLink
 from aniDBcommands import *
 from aniDBerrors import *
 from aniDBAbstracter import Anime, Episode
+from aniDBfileInfo import find_animes
 
 version = 100
 

@@ -23,7 +23,7 @@
 <form id="addShowForm" method="post" action="$sbRoot/home/addShows/addNewShow" accept-charset="utf-8">
 
 <fieldset class="sectionwrap">
-    <legend class="legendStep">Find a show on the TVDB</legend>
+    <legend class="legendStep">Find a show on TVDB/AniDB</legend>
 
     <div class="stepDiv">
         #if $use_provided_info:
@@ -36,6 +36,10 @@
             <select name="tvdbLang" id="tvdbLangSelect">
                 <option value="en" selected="selected">en</option>
             </select><b>*</b>
+
+            <input type="radio" name="dbToUse" value="tvdb" checked="checked" /> TVDB
+            <input type="radio" name="dbToUse" value="anidb" /> AniDB
+
             <input type="button" id="searchName" value="Search" /><br /><br />
     
             <b>*</b> This will only affect the language of the retrieved metadata file contents and episode filenames.<br />

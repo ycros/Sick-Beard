@@ -1490,36 +1490,52 @@ class NewHomeAddShows:
     def sanitizeFileName(self, name):
         return helpers.sanitizeFileName(name)
 
-    @cherrypy.expose
-    def searchTVDBForShowName(self, name, lang="en"):
-        if not lang or lang == 'null':
-                lang = "en"
-
+    def searchTVDBForShowName(self, lang, name):
         baseURL = "http://thetvdb.com/api/GetSeries.php?"
-
         params = {'seriesname': name.encode('utf-8'),
                   'language': lang}
-
         finalURL = baseURL + urllib.urlencode(params)
-
         urlData = helpers.getURL(finalURL)
-
         try:
             seriesXML = etree.ElementTree(etree.XML(urlData))
         except Exception, e:
-            logger.log(u"Unable to parse XML for some reason: "+ex(e)+" from XML: "+urlData, logger.ERROR)
+            logger.log(u"Unable to parse XML for some reason: " + ex(e) + " from XML: " + urlData, logger.ERROR)
             return ''
-
         series = seriesXML.getiterator('Series')
-
+        results = []
+        for curSeries in series:
+            results.append((
+            int(curSeries.findtext('seriesid')), curSeries.findtext('SeriesName'), curSeries.findtext('FirstAired')))
+        lang_id = tvdb_api.Tvdb().config['langabbv_to_id'][lang]
+        return json.dumps({'results': results, 'langid': lang_id})
+    
+    def searchAniDBForShowName(self, lang, name):
+        animes = adba.find_animes(name)
         results = []
 
-        for curSeries in series:
-            results.append((int(curSeries.findtext('seriesid')), curSeries.findtext('SeriesName'), curSeries.findtext('FirstAired')))
+        for anime in animes:
+            main_title = ''
+            for title in anime.iter('title'):
+                main_title = title.text
+                if title.attrib['type'] == 'main':
+                    break
 
-        lang_id = tvdb_api.Tvdb().config['langabbv_to_id'][lang]
+            results.append((int(anime.attrib['aid']), main_title, ''))
 
-        return json.dumps({'results': results, 'langid': lang_id})
+        return json.dumps({'results': results, 'langid': tvdb_api.Tvdb().config['langabbv_to_id'][lang]})
+
+    @cherrypy.expose
+    def searchDBForShowName(self, name, lang="en", db="tvdb"):
+        if not lang or lang == 'null':
+            lang = "en"
+
+        if not db or db == 'null':
+            db = 'tvdb'
+
+        if db == 'anidb':
+            return self.searchAniDBForShowName(lang, name)
+        else:
+            return self.searchTVDBForShowName(lang, name)
 
     @cherrypy.expose
     def massAddTable(self, rootDir=None):
@@ -1799,8 +1815,6 @@ class NewHomeAddShows:
 
         # for the remaining shows we need to prompt for each one, so forward this on to the newShow page
         return self.newShow(dirs_only[0], dirs_only[1:])
-
-
 
 
 ErrorLogsMenu = [

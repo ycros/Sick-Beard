@@ -435,3 +435,11 @@ class Whitelist(Blacklist):
         query = "CREATE TABLE whitelist (show_id INTEGER, range TEXT, keyword TEXT);"
         self.connection.action(query)
         #self.incDBVersion()
+
+class AniDBId(Whitelist):
+
+    def test(self):
+        return self.hasColumn("tv_shows", "anidb_id")
+
+    def execute(self):
+        self.addColumn("tv_shows", "anidb_id", "NUMERIC", "NULL")

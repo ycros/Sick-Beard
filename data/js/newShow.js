@@ -34,7 +34,7 @@ $(document).ready(function(){
 
         $('#searchResults').html('<img id="searchingAnim" src="'+sbRoot+'/images/loading32.gif" height="32" width="32" /> searching...');
 
-        $.getJSON(sbRoot+'/home/addShows/searchTVDBForShowName', {'name': $('#nameToSearch').val(), 'lang': $('#tvdbLangSelect').val()}, function(data){
+        $.getJSON(sbRoot+'/home/addShows/searchDBForShowName', {'name': $('#nameToSearch').val(), 'lang': $('#tvdbLangSelect').val(), 'db': $('input:radio[name=dbToUse]:checked').val()}, function(data){
             var firstResult = true;
             var resultStr = '<fieldset>\n<legend>Search Results:</legend>\n';
             
